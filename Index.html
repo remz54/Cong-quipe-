@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f1923">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Congés Équipe</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1923;
+    --bg2: #162030;
+    --bg3: #1d2b3a;
+    --card: #1a2535;
+    --border: #2a3d52;
+    --accent: #4fc3f7;
+    --accent2: #f9a825;
+    --accent3: #66bb6a;
+    --danger: #ef5350;
+    --text: #e8f0f8;
+    --muted: #7a9bb5;
+    --radius: 14px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0d1f2e 0%, #162030 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 12px;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .header-top { display:flex; align-items:center; justify-content:space-between; }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-icon {
+    width:38px; height:38px; background: linear-gradient(135deg, var(--accent), #0288d1);
+    border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:18px; box-shadow: 0 4px 12px rgba(79,195,247,.3);
+  }
+  .logo h1 { font-family:'DM Serif Display',serif; font-size:1.3rem; letter-spacing:-.02em; }
+  .logo span { font-size:.7rem; color:var(--muted); display:block; margin-top:-2px; }
+  .notif-btn {
+    width:38px; height:38px; border-radius:10px; border:1px solid var(--border);
+    background:var(--bg3); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    font-size:18px; position:relative; transition:.2s;
+  }
+  .notif-btn:hover { background:var(--border); }
+  .notif-dot {
+    width:8px; height:8px; background:var(--danger); border-radius:50%;
+    position:absolute; top:6px; right:6px; border:1.5px solid var(--bg);
+  }
+
+  /* NAV */
+  nav {
+    display:flex; gap:4px; margin-top:12px; background:var(--bg3);
+    padding:4px; border-radius:10px;
+  }
+  nav button {
+    flex:1; padding:8px 4px; border:none; background:none; color:var(--muted);
+    font-family:'DM Sans',sans-serif; font-size:.78rem; font-weight:500;
+    border-radius:7px; cursor:pointer; transition:.2s;
+  }
+  nav button.active { background:var(--card); color:var(--text); box-shadow:0 2px 8px rgba(0,0,0,.3); }
+
+  /* MAIN */
+  main { padding:16px; max-width:500px; margin:0 auto; }
+
+  /* SECTIONS */
+  .section { display:none; animation: fadeUp .3s ease; }
+  .section.active { display:block; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+  /* CARDS */
+  .card {
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px; margin-bottom:12px;
+  }
+  .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .card-title { font-size:.85rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+
+  /* FORM */
+  .form-group { margin-bottom:12px; }
+  label { display:block; font-size:.78rem; color:var(--muted); margin-bottom:5px; font-weight:500; }
+  input, select, textarea {
+    width:100%; padding:10px 12px; background:var(--bg3); border:1px solid var(--border);
+    border-radius:9px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.88rem;
+    outline:none; transition:.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(79,195,247,.1); }
+  select option { background:var(--bg3); }
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  /* BUTTONS */
+  .btn {
+    padding:11px 18px; border:none; border-radius:9px; font-family:'DM Sans',sans-serif;
+    font-size:.88rem; font-weight:600; cursor:pointer; transition:.2s; display:inline-flex;
+    align-items:center; gap:6px;
+  }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),#0288d1); color:#0f1923; }
+  .btn-primary:hover { opacity:.9; transform:translateY(-1px); }
+  .btn-danger { background:rgba(239,83,80,.15); color:var(--danger); border:1px solid rgba(239,83,80,.3); }
+  .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+  .btn-sm { padding:6px 12px; font-size:.78rem; }
+  .btn-full { width:100%; justify-content:center; }
+
+  /* LEAVE ITEM */
+  .leave-item {
+    background:var(--bg3); border:1px solid var(--border); border-radius:11px;
+    padding:14px; margin-bottom:10px; position:relative; overflow:hidden;
+    transition:.2s;
+  }
+  .leave-item::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background:linear-gradient(135deg,var(--accent),#0288d1);
+  }
+  .leave-item.soon::before { background:linear-gradient(135deg,var(--accent2),#e65100); }
+  .leave-item.ongoing::before { background:linear-gradient(135deg,var(--accent3),#1b5e20); }
+  .leave-item:hover { border-color:var(--accent); transform:translateX(2px); }
+  .leave-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .leave-name { font-weight:600; font-size:.95rem; }
+  .leave-role { font-size:.72rem; color:var(--muted); margin-top:1px; }
+  .badge {
+    font-size:.68rem; padding:3px 8px; border-radius:20px; font-weight:600;
+    white-space:nowrap;
+  }
+  .badge-blue { background:rgba(79,195,247,.15); color:var(--accent); }
+  .badge-orange { background:rgba(249,168,37,.15); color:var(--accent2); }
+  .badge-green { background:rgba(102,187,106,.15); color:var(--accent3); }
+  .badge-red { background:rgba(239,83,80,.15); color:var(--danger); }
+  .leave-dates { font-size:.78rem; color:var(--muted); margin:4px 0; display:flex; align-items:center; gap:5px; }
+  .leave-replace { font-size:.78rem; color:var(--text); margin-top:6px; }
+  .leave-replace span { color:var(--accent3); font-weight:500; }
+  .leave-actions { display:flex; gap:6px; margin-top:10px; }
+
+  /* EMPTY STATE */
+  .empty { text-align:center; padding:40px 20px; color:var(--muted); }
+  .empty-icon { font-size:3rem; margin-bottom:12px; opacity:.5; }
+  .empty p { font-size:.85rem; }
+
+  /* MEMBER ITEM */
+  .member-item {
+    display:flex; align-items:center; gap:12px;
+    background:var(--bg3); border:1px solid var(--border); border-radius:11px;
+    padding:12px; margin-bottom:8px;
+  }
+  .avatar {
+    width:40px; height:40px; border-radius:10px; display:flex; align-items:center;
+    justify-content:center; font-weight:700; font-size:1rem; flex-shrink:0;
+  }
+  .member-info { flex:1; }
+  .member-name { font-weight:600; font-size:.92rem; }
+  .member-role { font-size:.75rem; color:var(--muted); margin-top:2px; }
+  .member-actions { display:flex; gap:6px; }
+
+  /* DASHBOARD */
+  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .stat-card {
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:14px; text-align:center;
+  }
+  .stat-num { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:4px; }
+  .stat-label { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+
+  /* CALENDAR */
+  .calendar-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .cal-month { font-family:'DM Serif Display',serif; font-size:1.1rem; }
+  .cal-btn { background:var(--bg3); border:1px solid var(--border); color:var(--text); width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-day-label { text-align:center; font-size:.65rem; color:var(--muted); padding:4px 0; font-weight:600; text-transform:uppercase; }
+  .cal-day {
+    aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-size:.78rem; border-radius:7px; cursor:default; position:relative;
+  }
+  .cal-day.today { background:rgba(79,195,247,.2); color:var(--accent); font-weight:700; }
+  .cal-day.has-leave { background:rgba(249,168,37,.15); color:var(--accent2); font-weight:600; cursor:pointer; }
+  .cal-day.has-leave:hover { background:rgba(249,168,37,.3); }
+  .cal-day.empty { opacity:0; pointer-events:none; }
+
+  /* MODAL */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.7);
+    z-index:200; align-items:flex-end; justify-content:center;
+    backdrop-filter:blur(4px);
+  }
+  .modal-overlay.open { display:flex; animation:fadeIn .2s ease; }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  .modal {
+    background:var(--bg2); border:1px solid var(--border); border-radius:20px 20px 0 0;
+    padding:20px; width:100%; max-width:500px; max-height:90vh; overflow-y:auto;
+    animation:slideUp .3s ease;
+  }
+  @keyframes slideUp { from { transform:translateY(100%); } to { transform:none; } }
+  .modal-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 16px; }
+  .modal-title { font-family:'DM Serif Display',serif; font-size:1.2rem; margin-bottom:16px; }
+
+  /* TOAST */
+  .toast-container { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:300; pointer-events:none; }
+  .toast {
+    background:var(--bg3); border:1px solid var(--border); border-radius:10px;
+    padding:10px 16px; font-size:.82rem; text-align:center; margin-top:6px;
+    animation:toastIn .3s ease; box-shadow:0 8px 24px rgba(0,0,0,.4);
+    pointer-events:none;
+  }
+  @keyframes toastIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+  /* NOTIF PANEL */
+  .notif-panel {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
+    z-index:150; align-items:flex-start; justify-content:flex-end;
+    backdrop-filter:blur(4px);
+  }
+  .notif-panel.open { display:flex; }
+  .notif-content {
+    background:var(--bg2); border-left:1px solid var(--border); width:300px; height:100%;
+    padding:20px; overflow-y:auto; animation:slideLeft .3s ease;
+  }
+  @keyframes slideLeft { from { transform:translateX(100%); } to { transform:none; } }
+  .notif-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .notif-item {
+    background:var(--bg3); border:1px solid var(--border); border-radius:10px;
+    padding:12px; margin-bottom:8px;
+  }
+  .notif-item-title { font-size:.82rem; font-weight:600; margin-bottom:3px; }
+  .notif-item-body { font-size:.75rem; color:var(--muted); }
+  .notif-item-time { font-size:.68rem; color:var(--muted); margin-top:6px; }
+
+  .section-title {
+    font-family:'DM Serif Display',serif; font-size:1.3rem; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .divider { border:none; border-top:1px solid var(--border); margin:16px 0; }
+
+  /* scroll */
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">📅</div>
+      <div>
+        <h1>Congés Équipe</h1>
+        <span>Gestion des absences</span>
+      </div>
+    </div>
+    <button class="notif-btn" onclick="toggleNotifPanel()" id="notifBtn">
+      🔔
+      <div class="notif-dot" id="notifDot" style="display:none"></div>
+    </button>
+  </div>
+  <nav>
+    <button class="active" onclick="showTab('dashboard',this)">🏠 Accueil</button>
+    <button onclick="showTab('conges',this)">📋 Congés</button>
+    <button onclick="showTab('equipe',this)">👥 Équipe</button>
+    <button onclick="showTab('calendrier',this)">🗓 Calendrier</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="tab-dashboard">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Prochains congés</span>
+      </div>
+      <div id="upcomingList"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">En cours aujourd'hui</span>
+      </div>
+      <div id="ongoingList"></div>
+    </div>
+  </div>
+
+  <!-- CONGES -->
+  <div class="section" id="tab-conges">
+    <div class="section-title">
+      📋 Congés
+      <button class="btn btn-primary btn-sm" onclick="openAddLeave()" style="margin-left:auto">+ Ajouter</button>
+    </div>
+    <div id="leaveList"></div>
+  </div>
+
+  <!-- EQUIPE -->
+  <div class="section" id="tab-equipe">
+    <div class="section-title">
+      👥 Équipe
+      <button class="btn btn-primary btn-sm" onclick="openAddMember()" style="margin-left:auto">+ Membre</button>
+    </div>
+    <div id="memberList"></div>
+  </div>
+
+  <!-- CALENDRIER -->
+  <div class="section" id="tab-calendrier">
+    <div class="section-title">🗓 Calendrier</div>
+    <div class="card">
+      <div class="calendar-nav">
+        <button class="cal-btn" onclick="changeMonth(-1)">◀</button>
+        <span class="cal-month" id="calMonth"></span>
+        <button class="cal-btn" onclick="changeMonth(1)">▶</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div id="calDayDetail"></div>
+  </div>
+
+</main>
+
+<!-- MODAL CONGÉ -->
+<div class="modal-overlay" id="leaveModal" onclick="closeModal('leaveModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="leaveModalTitle">Ajouter un congé</div>
+    <div class="form-group">
+      <label>Membre de l'équipe *</label>
+      <select id="leaveMember"></select>
+    </div>
+    <div class="form-group row2">
+      <div>
+        <label>Date de début *</label>
+        <input type="date" id="leaveStart">
+      </div>
+      <div>
+        <label>Date de fin *</label>
+        <input type="date" id="leaveEnd">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Type de congé</label>
+      <select id="leaveType">
+        <option value="CP">Congés payés</option>
+        <option value="RTT">RTT</option>
+        <option value="Maladie">Arrêt maladie</option>
+        <option value="Formation">Formation</option>
+        <option value="Autre">Autre</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Remplaçant(s)</label>
+      <select id="leaveReplacer"></select>
+    </div>
+    <div class="form-group">
+      <label>Note (optionnel)</label>
+      <input type="text" id="leaveNote" placeholder="Ex: travail urgent à transmettre">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="saveLeave()">✓ Enregistrer</button>
+    <div style="height:8px"></div>
+    <button class="btn btn-ghost btn-full" onclick="closeModal('leaveModal')">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL MEMBRE -->
+<div class="modal-overlay" id="memberModal" onclick="closeModal('memberModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="memberModalTitle">Ajouter un membre</div>
+    <div class="form-group">
+      <label>Prénom & Nom *</label>
+      <input type="text" id="memberName" placeholder="Marie Dupont">
+    </div>
+    <div class="form-group">
+      <label>Poste / Fonction *</label>
+      <input type="text" id="memberRole" placeholder="Développeur, Chef de projet…">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="memberEmail" placeholder="marie@entreprise.fr">
+    </div>
+    <div class="form-group">
+      <label>Couleur avatar</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="colorPicker">
+        <div class="color-opt" data-color="#4fc3f7" style="width:28px;height:28px;border-radius:7px;background:#4fc3f7;cursor:pointer;border:2px solid transparent" onclick="selectColor(this)"></div>
+        <div class="color-opt" data-color="#f9a825" style="width:28px;height:28px;border-radius:7px;background:#f9a825;cursor:pointer;border:2px solid transparent" onclick="selectColor(this)"></div>
+        <div class="color-opt" data-color="#66bb6a" style="width:28px;height:28px;border-radius:7px;background:#66bb6a;cursor:pointer;border:2px solid transparent" onclick="selectColor(this)"></div>
+        <div class="color-opt" data-color="#ef5350" style="width:28px;height:28px;border-radius:7px;background:#ef5350;cursor:pointer;border:2px solid transparent" onclick="selectColor(this)"></div>
+        <div class="color-opt" data-color="#ab47bc" style="width:28px;height:28px;border-radius:7px;background:#ab47bc;cursor:pointer;border:2px solid transparent" onclick="selectColor(this)"></div>
+        <div class="color-opt" data-color="#ff7043" style="width:28px;height:28px;border-radius:7px;background:#ff7043;cursor:pointer;border:2px solid transparent" onclick="selectColor(this)"></div>
+        <div class="color-opt" data-color="#26c6da" style="width:28px;height:28px;border-radius:7px;background:#26c6da;cursor:pointer;border:2px solid transparent" onclick="selectColor(this)"></div>
+        <div class="color-opt" data-color="#d4e157" style="width:28px;height:28px;border-radius:7px;background:#d4e157;cursor:pointer;border:2px solid transparent" onclick="selectColor(this)"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="saveMember()">✓ Enregistrer</button>
+    <div style="height:8px"></div>
+    <button class="btn btn-ghost btn-full" onclick="closeModal('memberModal')">Annuler</button>
+  </div>
+</div>
+
+<!-- NOTIF PANEL -->
+<div class="notif-panel" id="notifPanel" onclick="closeNotifPanel()">
+  <div class="notif-content" onclick="event.stopPropagation()">
+    <div class="notif-header">
+      <strong>Notifications</strong>
+      <button class="btn btn-ghost btn-sm" onclick="closeNotifPanel()">✕</button>
+    </div>
+    <div id="notifList"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ========== STATE ==========
+let state = {
+  members: [],
+  leaves: [],
+  notifications: [],
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(),
+  editLeaveId: null,
+  editMemberId: null,
+  selectedColor: '#4fc3f7'
+};
+
+// Load from localStorage
+function load() {
+  const d = localStorage.getItem('conges_app_v2');
+  if (d) {
+    const p = JSON.parse(d);
+    state.members = p.members || [];
+    state.leaves = p.leaves || [];
+    state.notifications = p.notifications || [];
+  }
+  // Demo data if empty
+  if (!state.members.length) {
+    state.members = [
+      { id:'m1', name:'Alice Martin', role:'Chef de projet', email:'alice@co.fr', color:'#4fc3f7' },
+      { id:'m2', name:'Bob Lemaire', role:'Développeur', email:'bob@co.fr', color:'#66bb6a' },
+      { id:'m3', name:'Clara Rousseau', role:'Designer UX', email:'clara@co.fr', color:'#f9a825' },
+    ];
+    const today = new Date();
+    const fmt = d => d.toISOString().split('T')[0];
+    const d1 = new Date(today); d1.setDate(today.getDate()+2);
+    const d2 = new Date(today); d2.setDate(today.getDate()+8);
+    const d3 = new Date(today); d3.setDate(today.getDate()-1);
+    const d4 = new Date(today); d4.setDate(today.getDate()+3);
+    state.leaves = [
+      { id:'l1', memberId:'m1', start:fmt(d1), end:fmt(d2), type:'CP', replacerId:'m2', note:'Vacances été', createdAt:Date.now() },
+      { id:'l2', memberId:'m3', start:fmt(d3), end:fmt(d4), type:'RTT', replacerId:'m1', note:'', createdAt:Date.now() },
+    ];
+    save();
+  }
+}
+
+function save() {
+  localStorage.setItem('conges_app_v2', JSON.stringify({
+    members: state.members, leaves: state.leaves, notifications: state.notifications
+  }));
+}
+
+// ========== HELPERS ==========
+function uid() { return '_' + Math.random().toString(36).substr(2,9); }
+function getMember(id) { return state.members.find(m=>m.id===id); }
+function initials(name) { return name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2); }
+function formatDate(str) {
+  if (!str) return '';
+  const [y,m,d] = str.split('-');
+  return `${d}/${m}/${y}`;
+}
+function daysUntil(str) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const d = new Date(str);
+  return Math.round((d-now)/(1000*60*60*24));
+}
+function isOngoing(start, end) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  return new Date(start) <= now && new Date(end) >= now;
+}
+function leaveStatus(leave) {
+  const du = daysUntil(leave.start);
+  if (isOngoing(leave.start, leave.end)) return 'ongoing';
+  if (du < 0) return 'past';
+  if (du <= 1) return 'tomorrow';
+  if (du <= 7) return 'soon';
+  return 'future';
+}
+
+// ========== TABS ==========
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id==='calendrier') renderCalendar();
+}
+
+// ========== RENDER DASHBOARD ==========
+function renderDashboard() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = state.leaves.filter(l=>daysUntil(l.start)>=0 && daysUntil(l.start)<=30);
+  const ongoing = state.leaves.filter(l=>isOngoing(l.start,l.end));
+  const thisMonth = state.leaves.filter(l=>{
+    const d=new Date(l.start);
+    return d.getMonth()===today.getMonth() && d.getFullYear()===today.getFullYear();
+  });
+  const totalLeaves = state.leaves.filter(l=>daysUntil(l.end)>=0);
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--accent)">${state.members.length}</div>
+      <div class="stat-label">Membres</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--accent3)">${ongoing.length}</div>
+      <div class="stat-label">En congé</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--accent2)">${upcoming.length}</div>
+      <div class="stat-label">Ce mois</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#ab47bc">${totalLeaves.length}</div>
+      <div class="stat-label">À venir</div>
+    </div>
+  `;
+
+  // Upcoming
+  const upEl = document.getElementById('upcomingList');
+  const futureLeaves = state.leaves.filter(l=>daysUntil(l.start)>0).sort((a,b)=>new Date(a.start)-new Date(b.start)).slice(0,3);
+  upEl.innerHTML = futureLeaves.length ? futureLeaves.map(l=>leaveCard(l,true)).join('') : '<div class="empty"><div class="empty-icon">🏖</div><p>Aucun congé à venir</p></div>';
+
+  // Ongoing
+  const onEl = document.getElementById('ongoingList');
+  onEl.innerHTML = ongoing.length ? ongoing.map(l=>leaveCard(l,true)).join('') : '<div class="empty"><div class="empty-icon">✅</div><p>Tout le monde est présent</p></div>';
+}
+
+function leaveCard(leave, compact=false) {
+  const m = getMember(leave.memberId);
+  const r = getMember(leave.replacerId);
+  if (!m) return '';
+  const status = leaveStatus(leave);
+  const du = daysUntil(leave.start);
+  let badgeClass='badge-blue', badgeText='À venir';
+  if (status==='ongoing') { badgeClass='badge-green'; badgeText='En cours'; }
+  else if (status==='tomorrow') { badgeClass='badge-orange'; badgeText='Demain'; }
+  else if (status==='soon') { badgeClass='badge-orange'; badgeText=`Dans ${du}j`; }
+  else if (status==='past') { badgeClass='badge-red'; badgeText='Passé'; }
+  return `
+    <div class="leave-item ${status}">
+      <div class="leave-top">
+        <div>
+          <div class="leave-name">${m.name}</div>
+          <div class="leave-role">${m.role} · ${leave.type}</div>
+        </div>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <div class="leave-dates">📅 ${formatDate(leave.start)} → ${formatDate(leave.end)}</div>
+      ${r ? `<div class="leave-replace">Remplacé par <span>${r.name}</span></div>` : ''}
+      ${leave.note ? `<div class="leave-dates" style="margin-top:4px">💬 ${leave.note}</div>` : ''}
+      ${!compact ? `
+      <div class="leave-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editLeave('${leave.id}')">✏️ Modifier</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑</button>
+      </div>` : ''}
+    </div>`;
+}
+
+// ========== RENDER LEAVES ==========
+function renderLeaves() {
+  const sorted = [...state.leaves].sort((a,b)=>new Date(a.start)-new Date(b.start));
+  document.getElementById('leaveList').innerHTML = sorted.length
+    ? sorted.map(l=>leaveCard(l,false)).join('')
+    : '<div class="empty"><div class="empty-icon">📭</div><p>Aucun congé enregistré.<br>Ajoutez le premier !</p></div>';
+}
+
+// ========== RENDER MEMBERS ==========
+function renderMembers() {
+  const el = document.getElementById('memberList');
+  el.innerHTML = state.members.length ? state.members.map(m=>`
+    <div class="member-item">
+      <div class="avatar" style="background:${m.color}20;color:${m.color};border:1px solid ${m.color}40">${initials(m.name)}</div>
+      <div class="member-info">
+        <div class="member-name">${m.name}</div>
+        <div class="member-role">${m.role}${m.email?` · ${m.email}`:''}</div>
+      </div>
+      <div class="member-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editMember('${m.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')">🗑</button>
+      </div>
+    </div>`).join('')
+    : '<div class="empty"><div class="empty-icon">👥</div><p>Aucun membre.<br>Commencez par ajouter votre équipe !</p></div>';
+}
+
+// ========== CALENDAR ==========
+function renderCalendar() {
+  const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  document.getElementById('calMonth').textContent = `${months[state.calMonth]} ${state.calYear}`;
+  const firstDay = new Date(state.calYear, state.calMonth, 1).getDay();
+  const daysInMonth = new Date(state.calYear, state.calMonth+1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = ['Di','Lu','Ma','Me','Je','Ve','Sa'];
+  let html = days.map(d=>`<div class="cal-day-label">${d}</div>`).join('');
+  for (let i=0;i<firstDay;i++) html += `<div class="cal-day empty"></div>`;
+  for (let d=1;d<=daysInMonth;d++) {
+    const dt = new Date(state.calYear, state.calMonth, d);
+    const dtStr = dt.toISOString().split('T')[0];
+    const isToday = dt.getTime()===today.getTime();
+    const hasLeave = state.leaves.some(l=>l.start<=dtStr && l.end>=dtStr);
+    html += `<div class="cal-day${isToday?' today':''}${hasLeave?' has-leave':''}" ${hasLeave?`onclick="showDayDetail('${dtStr}')"`:''}>${d}</div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+function changeMonth(dir) {
+  state.calMonth += dir;
+  if (state.calMonth>11) { state.calMonth=0; state.calYear++; }
+  if (state.calMonth<0) { state.calMonth=11; state.calYear--; }
+  renderCalendar();
+}
+
+function showDayDetail(dateStr) {
+  const leaves = state.leaves.filter(l=>l.start<=dateStr && l.end>=dateStr);
+  document.getElementById('calDayDetail').innerHTML = `
+    <div class="card">
+      <div class="card-header"><span class="card-title">📅 ${formatDate(dateStr)}</span></div>
+      ${leaves.map(l=>leaveCard(l,true)).join('')}
+    </div>`;
+}
+
+// ========== MODALS ==========
+function openAddLeave() {
+  state.editLeaveId = null;
+  document.getElementById('leaveModalTitle').textContent = 'Ajouter un congé';
+  document.getElementById('leaveStart').value = '';
+  document.getElementById('leaveEnd').value = '';
+  document.getElementById('leaveNote').value = '';
+  populateMemberSelects();
+  openModal('leaveModal');
+}
+
+function editLeave(id) {
+  const l = state.leaves.find(x=>x.id===id);
+  if (!l) return;
+  state.editLeaveId = id;
+  document.getElementById('leaveModalTitle').textContent = 'Modifier le congé';
+  populateMemberSelects();
+  document.getElementById('leaveMember').value = l.memberId;
+  document.getElementById('leaveStart').value = l.start;
+  document.getElementById('leaveEnd').value = l.end;
+  document.getElementById('leaveType').value = l.type;
+  document.getElementById('leaveReplacer').value = l.replacerId||'';
+  document.getElementById('leaveNote').value = l.note||'';
+  openModal('leaveModal');
+}
+
+function saveLeave() {
+  const memberId = document.getElementById('leaveMember').value;
+  const start = document.getElementById('leaveStart').value;
+  const end = document.getElementById('leaveEnd').value;
+  if (!memberId || !start || !end) { showToast('⚠️ Membre et dates obligatoires'); return; }
+  if (end < start) { showToast('⚠️ La fin doit être après le début'); return; }
+  const leave = {
+    id: state.editLeaveId || uid(),
+    memberId,
+    start, end,
+    type: document.getElementById('leaveType').value,
+    replacerId: document.getElementById('leaveReplacer').value || null,
+    note: document.getElementById('leaveNote').value,
+    createdAt: Date.now()
+  };
+  if (state.editLeaveId) {
+    state.leaves = state.leaves.map(l=>l.id===state.editLeaveId?leave:l);
+    showToast('✅ Congé modifié');
+  } else {
+    state.leaves.push(leave);
+    showToast('✅ Congé ajouté');
+    scheduleNotifications(leave);
+  }
+  save(); closeModal('leaveModal'); renderAll();
+}
+
+function deleteLeave(id) {
+  if (!confirm('Supprimer ce congé ?')) return;
+  state.leaves = state.leaves.filter(l=>l.id!==id);
+  save(); renderAll(); showToast('🗑 Congé supprimé');
+}
+
+function openAddMember() {
+  state.editMemberId = null;
+  document.getElementById('memberModalTitle').textContent = 'Ajouter un membre';
+  document.getElementById('memberName').value = '';
+  document.getElementById('memberRole').value = '';
+  document.getElementById('memberEmail').value = '';
+  state.selectedColor = '#4fc3f7';
+  document.querySelectorAll('.color-opt').forEach(o=>o.style.borderColor='transparent');
+  document.querySelector('[data-color="#4fc3f7"]').style.borderColor='white';
+  openModal('memberModal');
+}
+
+function editMember(id) {
+  const m = state.members.find(x=>x.id===id);
+  if (!m) return;
+  state.editMemberId = id;
+  document.getElementById('memberModalTitle').textContent = 'Modifier le membre';
+  document.getElementById('memberName').value = m.name;
+  document.getElementById('memberRole').value = m.role;
+  document.getElementById('memberEmail').value = m.email||'';
+  state.selectedColor = m.color;
+  document.querySelectorAll('.color-opt').forEach(o=>{
+    o.style.borderColor = o.dataset.color===m.color?'white':'transparent';
+  });
+  openModal('memberModal');
+}
+
+function saveMember() {
+  const name = document.getElementById('memberName').value.trim();
+  const role = document.getElementById('memberRole').value.trim();
+  if (!name||!role) { showToast('⚠️ Nom et poste obligatoires'); return; }
+  const member = {
+    id: state.editMemberId || uid(),
+    name, role,
+    email: document.getElementById('memberEmail').value.trim(),
+    color: state.selectedColor
+  };
+  if (state.editMemberId) {
+    state.members = state.members.map(m=>m.id===state.editMemberId?member:m);
+    showToast('✅ Membre modifié');
+  } else {
+    state.members.push(member);
+    showToast('✅ Membre ajouté');
+  }
+  save(); closeModal('memberModal'); renderAll();
+}
+
+function deleteMember(id) {
+  if (!confirm('Supprimer ce membre ?')) return;
+  state.members = state.members.filter(m=>m.id!==id);
+  save(); renderAll(); showToast('🗑 Membre supprimé');
+}
+
+function selectColor(el) {
+  state.selectedColor = el.dataset.color;
+  document.querySelectorAll('.color-opt').forEach(o=>o.style.borderColor='transparent');
+  el.style.borderColor = 'white';
+}
+
+function populateMemberSelects() {
+  const opts = `<option value="">-- Choisir --</option>` + state.members.map(m=>`<option value="${m.id}">${m.name} (${m.role})</option>`).join('');
+  document.getElementById('leaveMember').innerHTML = opts;
+  document.getElementById('leaveReplacer').innerHTML = `<option value="">-- Aucun remplaçant --</option>` + state.members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ========== NOTIFICATIONS ==========
+function scheduleNotifications(leave) {
+  const m = getMember(leave.memberId);
+  if (!m) return;
+  const r = getMember(leave.replacerId);
+  const startDate = new Date(leave.start);
+  const now = new Date();
+
+  // Check 7 days before
+  const sevenBefore = new Date(startDate); sevenBefore.setDate(startDate.getDate()-7);
+  if (sevenBefore > now) {
+    const notif = {
+      id: uid(), leaveId:leave.id,
+      title:`⏰ Dans 7 jours – ${m.name}`,
+      body:`${m.name} (${m.role}) part en ${leave.type} le ${formatDate(leave.start)}.${r?' Remplaçant : '+r.name:''}`,
+      triggerDate: sevenBefore.toISOString(),
+      shown: false
+    };
+    state.notifications.push(notif);
+    scheduleWebNotification(notif);
+  }
+
+  // Check 1 day before
+  const dayBefore = new Date(startDate); dayBefore.setDate(startDate.getDate()-1);
+  if (dayBefore > now) {
+    const notif = {
+      id: uid(), leaveId:leave.id,
+      title:`🔔 Demain – ${m.name}`,
+      body:`Rappel : ${m.name} est absent(e) demain (${leave.type}).${r?' Remplaçant : '+r.name:''}`,
+      triggerDate: dayBefore.toISOString(),
+      shown: false
+    };
+    state.notifications.push(notif);
+    scheduleWebNotification(notif);
+  }
+  save();
+}
+
+function scheduleWebNotification(notif) {
+  const delay = new Date(notif.triggerDate) - new Date();
+  if (delay > 0 && delay < 7*24*60*60*1000) { // Only schedule if within 7 days (JS timer limit)
+    setTimeout(()=>{
+      fireNotification(notif);
+    }, delay);
+  }
+}
+
+function fireNotification(notif) {
+  notif.shown = true;
+  save();
+  if ('Notification' in window && Notification.permission==='granted') {
+    new Notification(notif.title, { body:notif.body, icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="26" font-size="28">📅</text></svg>' });
+  }
+  addInAppNotif(notif);
+}
+
+function addInAppNotif(notif) {
+  const el = document.getElementById('notifList');
+  const item = document.createElement('div');
+  item.className = 'notif-item';
+  item.innerHTML = `<div class="notif-item-title">${notif.title}</div><div class="notif-item-body">${notif.body}</div><div class="notif-item-time">Maintenant</div>`;
+  el.prepend(item);
+  document.getElementById('notifDot').style.display = 'block';
+}
+
+function checkPendingNotifications() {
+  const now = new Date();
+  state.notifications.forEach(n=>{
+    if (!n.shown && new Date(n.triggerDate) <= now) {
+      fireNotification(n);
+    }
+  });
+  renderNotifications();
+}
+
+function renderNotifications() {
+  const el = document.getElementById('notifList');
+  const past = state.notifications.filter(n=>n.shown);
+  const upcoming = state.notifications.filter(n=>!n.shown).sort((a,b)=>new Date(a.triggerDate)-new Date(b.triggerDate));
+  const all = [...upcoming, ...past];
+  if (!all.length) {
+    el.innerHTML = '<div class="empty"><p>Aucune notification</p></div>';
+    return;
+  }
+  el.innerHTML = all.map(n=>`
+    <div class="notif-item">
+      <div class="notif-item-title">${n.title}</div>
+      <div class="notif-item-body">${n.body}</div>
+      <div class="notif-item-time">${n.shown?'Envoyé':'Prévu le '+formatDate(n.triggerDate.split('T')[0])}</div>
+    </div>`).join('');
+  if (past.length) document.getElementById('notifDot').style.display = 'block';
+}
+
+function requestNotifPermission() {
+  if ('Notification' in window) {
+    Notification.requestPermission().then(p=>{
+      if (p==='granted') showToast('🔔 Notifications activées !');
+      else showToast('ℹ️ Notifications refusées (vérifiez les réglages)');
+    });
+  }
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  if (panel.classList.contains('open')) {
+    closeNotifPanel();
+  } else {
+    renderNotifications();
+    panel.classList.add('open');
+    document.getElementById('notifDot').style.display = 'none';
+  }
+}
+function closeNotifPanel() { document.getElementById('notifPanel').classList.remove('open'); }
+
+// ========== TOAST ==========
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(()=>el.remove(), 3000);
+}
+
+// ========== RENDER ALL ==========
+function renderAll() {
+  renderDashboard();
+  renderLeaves();
+  renderMembers();
+}
+
+// ========== INIT ==========
+load();
+renderAll();
+checkPendingNotifications();
+// Ask for notif permission on load
+setTimeout(()=>{
+  if ('Notification' in window && Notification.permission==='default') {
+    showToast('🔔 Activez les notifications pour les rappels');
+    setTimeout(requestNotifPermission, 1500);
+  }
+}, 2000);
+// Check notifications periodically
+setInterval(checkPendingNotifications, 60000);
+</script>
+</body>
+</html>
